@@ -125,7 +125,7 @@ class Ajax(object):
             NewMessages = NewMessages[l-JQCHAT_DISPLAY_COUNT:]
             
         response =  render_to_response('jqchat/chat_payload.json',
-                                  {'current_unix_timestamp': time.time(),
+                                  {'current_unix_timestamp': int(time.time()),
                                    'NewMessages': NewMessages,
                                    'StatusCode': StatusCode,
                                    'NewDescription': NewDescription,
