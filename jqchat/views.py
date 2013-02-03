@@ -85,7 +85,7 @@ class Ajax(object):
             self.request_time = float(self.request.REQUEST['time'])
         except:
             return HttpResponseBadRequest("What's the time?")
-        self.ThisRoom = Room.objects.get(id=id)
+        self.ThisRoom = get_object_or_404(Room, pk=id)
         NewDescription = None
 
         if self.request.method == "POST":
