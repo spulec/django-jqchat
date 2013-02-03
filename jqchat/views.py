@@ -9,6 +9,9 @@ from models import Room, Message
 
 import time
 
+import pytz
+from pytz import timezone
+
 # The format of the date displayed in the chat window can be customised.
 try:
     DATE_FORMAT = settings.JQCHAT_DATE_FORMAT
@@ -104,9 +107,9 @@ class Ajax(object):
 
         # If using Pinax we can get the user's timezone.
         try:
-            user_tz = self.request.user.account_set.all()[0].timezone
+            user_tz = timezone(self.request.user.account_set.all()[0].timezone)
         except:
-            user_tz = settings.TIME_ZONE
+            user_tz = timezone(settings.TIME_ZONE)
     
         # Extra JSON string to be spliced into the response.
         CustomPayload = self.ExtraHandling()
