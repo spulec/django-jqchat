@@ -1,4 +1,4 @@
-{% extends "site_base.html" %}
+{% extends "html/base.html" %}
 {% load url from future %}
 
 {# An example chat window #}
@@ -25,6 +25,20 @@
      margin: 10px 0;
      overflow: auto;
      background-color: white;
+     float: left;
+   }
+   #memberswindow {
+     height: 250px;
+     width: 100px;
+     border: 1px solid;
+     padding: 5px;
+     margin: 10px 0;
+     overflow: auto;
+     background-color: white;
+     float: left;
+   }
+ .clear{
+     clear: both;
    }
 </style>
 
@@ -51,7 +65,8 @@
 <h2>Room description: <span id="chatroom_description"></span></h2>
 
 <div id="chatwindow"><span id="loading">Loading...</span></div>
-
+<div id="memberswindow"></div>
+<div class="clear"></div>
 <form id="chatform">
 	<label for="msg">Message:</label>
 	<input type="text" id="msg" />
@@ -67,3 +82,4 @@
 <script type="text/javascript">document.getElementById("msg").focus();</script>
 
 {% endblock %}
+
