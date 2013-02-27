@@ -74,9 +74,19 @@ function processResponse(payload) {
 	for(message in payload.messages) {
 		$("#chatwindow").append(payload.messages[message].text);
 	}
+        // Populate the room members window
+        $("#memberswindow").html("")
+        for(member in payload.members) {
+                $("#memberswindow").append('<strong>'+payload.members[member].username+'</strong><br />');
+        }
+
 	// Scroll down if messages fill up the div.
-	var objDiv = document.getElementById("chatwindow");
-	objDiv.scrollTop = objDiv.scrollHeight;
+	var chatDiv = document.getElementById("chatwindow");
+	chatDiv.scrollTop = chatDiv.scrollHeight;
+
+        // Scroll down if members fill up the div.
+        var membDiv = document.getElementById("memberswindow");
+	membDiv.scrollTop = membDiv.scrollHeight;
 
 	// Handle custom data (data other than messages).
 	// This is only called if a callback function has been specified.
@@ -171,3 +181,19 @@ function InitChatDescription(){
 	});
 
 }
+
+// Join leave section
+function room_join() {
+    clearInterval(IntervalID)
+    $.post(url,{time: timestamp, action: "room_join"}, function(payload) {processResponse(payload);}, 'json');
+    IntervalID = setInterval(callServer, CallInterval);
+}
+
+function room_leave() {
+    clearInterval(IntervalID)
+    $.post(url,{time: timestamp, action: "room_leave"}, function(payload) {processResponse(payload);}, 'json');
+    IntervalID = setInterval(callServer, CallInterval);
+}
+
+$(window).load(function(){room_join()});
+$(window).unload(function(){room_leave()});
