@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.utils.html import escape
 
-from models import Room, Message
+from models import Room, RoomMember, Message
 
 import time
 
@@ -97,6 +97,10 @@ class Ajax(object):
     
             if action == 'postmsg':
                 msg_text = self.request.POST['message']
+            if action == 'room_join':
+                RoomMember.objects.create_member(user=request.user, room=self.ThisRoom)
+            if action == 'room_leave':
+                RoomMember.objects.remove_member(user=request.user, room=self.ThisRoom)
     
                 if len(msg_text.strip()) > 0: # Ignore empty strings.
                     Message.objects.create_message(self.request.user, self.ThisRoom, escape(msg_text))
@@ -122,6 +126,9 @@ class Ajax(object):
         if NewMessages:
             StatusCode = 1
 
+        # Get the members list
+        NewMembers = RoomMember.objects.filter(room=self.ThisRoom)
+
         # Only keep the last X messages.
         l = len(NewMessages)
         if l > JQCHAT_DISPLAY_COUNT:
@@ -132,6 +139,7 @@ class Ajax(object):
                                    'NewMessages': NewMessages,
                                    'StatusCode': StatusCode,
                                    'NewDescription': NewDescription,
+                                   'NewMembers': NewMembers,
                                    'user_tz': user_tz,
                                    'CustomPayload': CustomPayload,
                                    'TimeDisplayFormat': DATE_FORMAT
