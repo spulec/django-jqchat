@@ -160,6 +160,37 @@ class Message(models.Model):
 
     objects = messageManager()
 
+class memberManager(models.Manager):
+    
+    def remove_member(self, user, room):
+        """Remove a room user association"""
+        usr_prev_rooms = RoomMember.objects.filter(user=user)
+        for prev_room in usr_prev_rooms:
+            if prev_room.room == room:
+                continue
+            Message.objects.create_event(user, prev_room.room, 3)
+        usr_prev_rooms.delete()
+
+    def create_member(self, user, room):
+        """Create a room user association"""
+        self.remove_member(user, room)        
+        Message.objects.create_event(user, room, 2)
+        m = RoomMember.objects.create(user=user, room=room)
+
+        return m
+
+class RoomMember(models.Model):
+    """A room member"""
+    room = models.ForeignKey(Room, null=True)
+    user = models.ForeignKey(User)
+    
+    def save(self, **kw):
+        super(RoomMember, self).save(**kw)
+    class Meta:
+        ordering = ['user']
+
+    objects = memberManager()
+
 def display_timestamp(t):
         """Takes a Unix timestamp as a an arg, returns a text string with
         '<unix timestamp> (<equivalent time>)'."""
