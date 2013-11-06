@@ -1,0 +1,2 @@
+recursive-include jqchat/templates *
+recursive-include jqchat/static *
