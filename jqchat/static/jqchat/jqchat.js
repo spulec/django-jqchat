@@ -72,7 +72,10 @@ function processResponse(payload) {
 	// Get the timestamp, store it in global variable to be passed to the server on next call.
 	timestamp = payload.time;
 	for(message in payload.messages) {
-		$("#chatwindow").append(payload.messages[message].text);
+    var html = ("<span class='jqchat-time'>{{TIME}}</span> {{TEXT}}".
+        replace("{{TIME}}", payload.messages[message].time).
+        replace("{{TEXT}}", payload.messages[message].text));
+		$("#chatwindow").append(html);
 	}
         // Populate the room members window
         $("#memberswindow").html("")

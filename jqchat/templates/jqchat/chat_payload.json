@@ -6,7 +6,10 @@
 {% if NewDescription %}	"description": {{ NewDescription }},{% endif %}
 	"messages": [
 {% for row in NewMessages %}{# The timezone filter is part of Django timezone and adjusts a datetime to the given timezone #}
-	{ "text": "{{ row.created|timezone:user_tz|date:TimeDisplayFormat }} {{ row.text|safe }}"}{% if not forloop.last %},{% endif %}
+	{
+        "time": "{{ row.created|timezone:user_tz|date:TimeDisplayFormat }}",
+        "text": "{{ row.text|safe }}"
+    }{% if not forloop.last %},{% endif %}
 {% endfor %}
 	],
 
