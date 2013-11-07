@@ -122,7 +122,7 @@ class Ajax(object):
     
         # Get new messages - do this last in case the ExtraHandling has itself generated
         # new messages. 
-        NewMessages = self.ThisRoom.message_set.filter(unix_timestamp__gt=self.request_time)
+        NewMessages = self.ThisRoom.message_set.filter(unix_timestamp__gt=self.request_time).filter(event=None)
         if NewMessages:
             StatusCode = 1
 
