@@ -8,6 +8,7 @@
 {% for row in NewMessages %}{# The timezone filter is part of Django timezone and adjusts a datetime to the given timezone #}
 	{
         "time": "{{ row.created|timezone:user_tz|date:TimeDisplayFormat }}",
+        "timestamp": "{{ row.created|timezone:user_tz|date:'U' }}",
         "text": "{{ row.text|safe }}"
     }{% if not forloop.last %},{% endif %}
 {% endfor %}

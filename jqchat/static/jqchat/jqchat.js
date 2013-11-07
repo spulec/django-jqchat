@@ -72,8 +72,9 @@ function processResponse(payload) {
 	// Get the timestamp, store it in global variable to be passed to the server on next call.
 	timestamp = payload.time;
 	for(message in payload.messages) {
-    var html = ("<span class='jqchat-time'>{{TIME}}</span> {{TEXT}}".
+    var html = ("<span class='jqchat-time' data-timestamp='{{TIMESTAMP}}'>{{TIME}}</span> {{TEXT}}".
         replace("{{TIME}}", payload.messages[message].time).
+        replace("{{TIMESTAMP}}", payload.messages[message].timestamp).
         replace("{{TEXT}}", payload.messages[message].text));
 		$("#chatwindow").append(html);
 	}
