@@ -20,7 +20,7 @@ except:
     DATE_FORMAT = "H:i:s"
 
 # How many messages to retrieve at most.
-JQCHAT_DISPLAY_COUNT = getattr(settings, 'JQCHAT_DISPLAY_COUNT', 100) 
+JQCHAT_DISPLAY_COUNT = getattr(settings, 'JQCHAT_DISPLAY_COUNT', 100)
 
 #------------------------------------------------------------------------------
 @login_required
@@ -59,8 +59,8 @@ class Ajax(object):
     On the first call, this should be set to 0, thereafter the server will supply a new system time
     on each call.
     - the room ID number.
-    
-    Requests that include new data for the server (e.g. new messages) should be sent as a POST and 
+
+    Requests that include new data for the server (e.g. new messages) should be sent as a POST and
     contain the following extra args:
     - an action code, a short string describing the type of data sent.
     - message, a string containing the message sent by the user.
@@ -69,7 +69,7 @@ class Ajax(object):
      1: got new data.
      2: no new data, nothing to update.
 
-    This code is written as a class, the idea being that implementations of a chat window will 
+    This code is written as a class, the idea being that implementations of a chat window will
     have extra features, so these will be coded as derived classes.
     Included below is a basic example for updating the room's description field.
 
@@ -81,7 +81,7 @@ class Ajax(object):
 
         if not request.user.is_authenticated():
             return HttpResponseBadRequest('You need to be logged in to access the chat system.')
-    
+
         StatusCode = 0 # Default status code is 0 i.e. no new data.
         self.request = request
         try:
@@ -94,16 +94,15 @@ class Ajax(object):
         if self.request.method == "POST":
             # User has sent new data.
             action = self.request.POST['action']
-    
+
             if action == 'postmsg':
                 msg_text = self.request.POST['message']
+                if len(msg_text.strip()) > 0: # Ignore empty strings.
+                    Message.objects.create_message(self.request.user, self.ThisRoom, escape(msg_text))
             if action == 'room_join':
                 RoomMember.objects.create_member(user=request.user, room=self.ThisRoom)
             if action == 'room_leave':
                 RoomMember.objects.remove_member(user=request.user, room=self.ThisRoom)
-    
-            if len(msg_text.strip()) > 0: # Ignore empty strings.
-                Message.objects.create_message(self.request.user, self.ThisRoom, escape(msg_text))
         else:
             # If a GET, make sure that no action was specified.
             if self.request.GET.get('action', None):
@@ -114,14 +113,14 @@ class Ajax(object):
             user_tz = timezone(self.request.user.account_set.all()[0].timezone)
         except:
             user_tz = timezone(settings.TIME_ZONE)
-    
+
         # Extra JSON string to be spliced into the response.
         CustomPayload = self.ExtraHandling()
         if CustomPayload:
             StatusCode = 1
-    
+
         # Get new messages - do this last in case the ExtraHandling has itself generated
-        # new messages. 
+        # new messages.
         NewMessages = self.ThisRoom.message_set.filter(unix_timestamp__gt=self.request_time).filter(event=None)
         if NewMessages:
             StatusCode = 1
@@ -133,7 +132,7 @@ class Ajax(object):
         l = len(NewMessages)
         if l > JQCHAT_DISPLAY_COUNT:
             NewMessages = NewMessages[l-JQCHAT_DISPLAY_COUNT:]
-            
+
         response =  render_to_response('jqchat/chat_payload.json',
                                   {'current_unix_timestamp': time.time(),
                                    'NewMessages': NewMessages,
@@ -152,13 +151,13 @@ class Ajax(object):
     def ExtraHandling(self):
         """We might want to receive/send extra data in the Ajax calls.
         This function is there to be overriden in child classes.
-        
-        Basic usage is to generate the JSON that then gets spliced into the main JSON 
+
+        Basic usage is to generate the JSON that then gets spliced into the main JSON
         response.
-        
+
         """
         return None
-        
+
 
 BasicAjaxHandler = Ajax()
 
@@ -182,7 +181,7 @@ class DescriptionAjax(Ajax):
         # If yes, return an extra field to be tagged on to the JSON returned to the client.
         if self.ThisRoom.description and self.ThisRoom.description_modified > self.request_time:
             return ',\n        "description": "%s"' % self.ThisRoom.description
-        
+
         return None
 
 WindowWithDescriptionAjaxHandler = DescriptionAjax()
