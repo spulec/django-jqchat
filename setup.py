@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='django-jqchat',
-    version='0.1.2',
+    version='0.1.3',
     packages=['jqchat'],
     author='Richard Barran',
     include_package_data=True,
