@@ -3,11 +3,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from django.utils.safestring import mark_safe
+from django.template import Context
+from django.template.loader import get_template
 from django.conf import settings
 
 import datetime
 import time
+
 
 class Room(models.Model):
     """Conversations can take place in one of many rooms.
@@ -90,9 +92,11 @@ class messageManager(models.Manager):
 
     def create_message(self, user, room, msg):
         """Create a message for the given user."""
-        m = Message.objects.create(user=user,
-                                   room=room,
-                                   text='<strong>%s</strong> %s<br />' % (user, msg))
+        message_template = get_template('jqchat/chat_message.html')
+        raw_text = message_template.render(Context({'user': user, 'msg': msg}))
+        # Clean html before save to db
+        text = ''.join(raw_text.replace('"', "'").split('\n')).strip().replace('\t', '')
+        m = Message.objects.create(user=user, room=room, text=text)
         return m
 
     def create_event(self, user, room, event_id):
