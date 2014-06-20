@@ -101,10 +101,11 @@ class messageManager(models.Manager):
 
     def create_event(self, user, room, event_id):
         """Create an event for the given user."""
-        m = Message(user=user,
-                    room=room,
-                    event=event_id)
-        m.text = "<strong>%s</strong> <em>%s</em><br />" % (user, m.get_event_display())
+        m = Message(user=user, room=room, event=event_id)
+        message_template = get_template('jqchat/chat_event.html')
+        raw_text = message_template.render(Context({'user': user, 'event': m.get_event_display()}))
+        # Clean html before save to db
+        m.text = ''.join(raw_text.replace('"', "'").split('\n')).strip().replace('\t', '')
         m.save()
         return m
 
